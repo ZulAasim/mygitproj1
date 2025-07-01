@@ -1,0 +1,43 @@
+name: Generate Word Document from Markdown
+
+on:
+  push:
+    branches:
+      - main # Or master, or your default branch
+    paths:
+      - 'README.md' # Trigger only when README.md changes
+      - '.github/workflows/generate-word-doc.yml' # Trigger if the workflow file itself changes
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
+
+jobs:
+  convert_to_docx:
+    runs-on: ubuntu-latest # Or windows-latest if you prefer a Windows environment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        # Pandoc is usually available in the Ubuntu repositories.
+        # For more complex installations or specific versions, you might use a pre-built action
+        # like a Docker container action for Pandoc.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Create output directory
+        run: mkdir -p artifacts
+
+      - name: Convert Markdown to DOCX
+        # -s or --standalone creates a complete document (with headers, footers, etc.)
+        # --toc generates a table of contents if your Markdown has headings
+        run: |
+          pandoc -s --toc README.md -o artifacts/Project_Overview.docx
+          echo "Markdown converted to DOCX successfully to artifacts/Project_Overview.docx"
+
+      - name: Upload generated DOCX as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-documentation-docx
+          path: artifacts/Project_Overview.docx # Path to the generated DOCX file
+          retention-days: 7 # Keep the artifact for 7 days
