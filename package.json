@@ -1,0 +1,23 @@
+{
+  "name": "mygitproj1",
+  "version": "1.0.0",
+  "description": "This is a sample Markdown document for demonstrating conversion to a Word document.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZulAasim/mygitproj1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZulAasim/mygitproj1/issues"
+  },
+  "homepage": "https://github.com/ZulAasim/mygitproj1#readme",
+  "devDependencies": {
+    "conventional-changelog-cli": "^5.0.0"
+  }
+}
