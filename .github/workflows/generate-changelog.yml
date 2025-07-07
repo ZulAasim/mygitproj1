@@ -15,22 +15,13 @@ jobs:
       - name: Extract latest changelog block
         id: changelog
         run: |
-          # Get first version block: from first '# ' to next '# ' or EOF
           awk '
-            /^# / {
-              if (p) exit; 
-              p=1
-            }
-            p { print }
+            /^# / { if (p) exit; p=1 } p { print }
           ' CHANGELOG.md > latest_changelog.md
 
-          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          cat latest_changelog.md >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Update GitHub Release description
-        uses: softprops/action-gh-release@v2
-        with:
-          body: ${{ env.CHANGELOG }}
+      - name: Update release body with gh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "$GITHUB_REF_NAME" --notes-file latest_changelog.md
+
