@@ -1,0 +1,57 @@
+name: Generate Changelog on Release
+
+on:
+  release:
+    types: [published] # This workflow runs only when a new release is published
+
+jobs:
+  update_changelog:
+    runs-on: ubuntu-latest # Or your preferred runner image
+
+    permissions:
+      # Necessary to checkout code and push changes back
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history so conventional-changelog can correctly
+          # calculate changes since the previous release.
+          fetch-depth: 0
+          # The GITHUB_TOKEN is usually enough, but sometimes for pushing
+          # back to the repo, it helps to explicitly use it.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Use a stable Node.js version you prefer
+
+      - name: Install dependencies
+        run: npm install # Installs conventional-changelog-cli and other devDependencies
+
+      - name: Generate Changelog
+        # conventional-changelog will automatically update CHANGELOG.md
+        # based on commits since the last release tag (which 'on: release' implies).
+        run: npm run changelog
+
+      - name: Get the current release tag
+        id: get_release_tag
+        run: echo "::set-output name=tag_name::${{ github.event.release.tag_name }}"
+
+      - name: Update CHANGELOG.md and commit
+        # This conditional ensures we only try to commit if there are actual changes
+        # to the changelog file. 'git diff --quiet' checks if there are differences.
+        run: |
+          if ! git diff --quiet CHANGELOG.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add CHANGELOG.md
+            git commit -m "docs: Update CHANGELOG.md for release ${{ steps.get_release_tag.outputs.tag_name }} [skip ci]"
+            git push
+            echo "CHANGELOG.md updated and pushed."
+          else
+            echo "CHANGELOG.md is already up-to-date. No commit needed."
+          fi
