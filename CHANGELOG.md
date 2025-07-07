@@ -4,6 +4,7 @@
 ### Bug Fixes
 
 * fixed something ([d35d29d](https://github.com/ZulAasim/mygitproj1/commit/d35d29dea58945e94d70f6d4858e49c7232679c1))
+* fixixixing ([0a197d9](https://github.com/ZulAasim/mygitproj1/commit/0a197d95b14fe6e758c122f25d8f4503a18f0d9e))
 * **login:** resolve authentication issue ([34f4ca6](https://github.com/ZulAasim/mygitproj1/commit/34f4ca6c96f12856f89816da270d72fec41cd14b))
 
 
