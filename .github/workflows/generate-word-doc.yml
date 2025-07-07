@@ -1,43 +1,58 @@
-name: Generate Word Document from Markdown
+name: Generate Changelog on Release
 
 on:
-  push:
-    branches:
-      - main # Or master, or your default branch
-    paths:
-      - 'README.md' # Trigger only when README.md changes
-      - '.github/workflows/generate-word-doc.yml' # Trigger if the workflow file itself changes
-  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
+  release:
+    types: [published]
 
 jobs:
-  convert_to_docx:
-    runs-on: ubuntu-latest # Or windows-latest if you prefer a Windows environment
+  update_changelog:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # Essential for pushing back to the repo
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install Pandoc
-        # Pandoc is usually available in the Ubuntu repositories.
-        # For more complex installations or specific versions, you might use a pre-built action
-        # like a Docker container action for Pandoc.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      - name: Create output directory
-        run: mkdir -p artifacts
-
-      - name: Convert Markdown to DOCX
-        # -s or --standalone creates a complete document (with headers, footers, etc.)
-        # --toc generates a table of contents if your Markdown has headings
-        run: |
-          pandoc -s --toc README.md -o artifacts/Project_Overview.docx
-          echo "Markdown converted to DOCX successfully to artifacts/Project_Overview.docx"
-
-      - name: Upload generated DOCX as artifact
-        uses: actions/upload-artifact@v4
         with:
-          name: project-documentation-docx
-          path: artifacts/Project_Overview.docx # Path to the generated DOCX file
-          retention-days: 7 # Keep the artifact for 7 days
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate Changelog
+        run: npm run changelog
+
+      - name: Get the current release tag
+        id: get_release_tag
+        run: echo "::set-output name=tag_name::${{ github.event.release.tag_name }}"
+        # Note: '::set-output' is deprecated in favor of environment files.
+        # For a future-proof version, you might use:
+        # run: echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+        # Then access with steps.get_release_tag.outputs.tag_name
+
+      - name: Update CHANGELOG.md and commit
+        run: |
+          if ! git diff --quiet CHANGELOG.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add CHANGELOG.md
+            git commit -m "docs: Update CHANGELOG.md for release ${{ steps.get_release_tag.outputs.tag_name }} [skip ci]"
+            
+            # --- THE CRUCIAL CHANGE IS HERE ---
+            # Instead of just 'git push', explicitly push to the 'main' branch
+            git push origin HEAD:main # Pushes the current (detached HEAD) commit to 'main'
+            # OR, if your default branch is 'master':
+            # git push origin HEAD:master
+            
+            echo "CHANGELOG.md updated and pushed."
+          else
+            echo "CHANGELOG.md is already up-to-date. No commit needed."
+          fi
