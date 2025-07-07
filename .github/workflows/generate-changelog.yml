@@ -1,9 +1,13 @@
-name: Update Release Changelog
+name: Update Release note
 
 on:
   release:
-    types: [created]
+    types:
+      - created # Trigger only when a new release is created
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
 
+permissions:
+  contents: write 
 jobs:
   update-release:
     runs-on: ubuntu-latest
