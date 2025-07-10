@@ -1,0 +1,44 @@
+name: Updating ECSDOT-Baremetal-repo
+
+on: 
+  push:
+    branches: 
+      - main
+  workflow_dispatch:
+
+jobs:
+  copy-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v3
+
+      - name: Copy file to another repo manually
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        run: |
+          # Setup some variables
+          DEST_REPO="zulaasim/testing"
+          DEST_BRANCH="main"
+          DEST_DIR="projects/my-project"
+          FILES="test.md"
+
+          # Clone the destination repo
+          git clone https://x-access-token:${API_TOKEN_GITHUB}@github.com/${DEST_REPO}.git dest-repo
+          cd dest-repo
+
+          # Switch to the target branch (create if missing)
+          git checkout ${DEST_BRANCH} || git checkout -b ${DEST_BRANCH}
+
+          # Copy the files
+          cp -rvf ../${FILES} ${DEST_DIR}
+
+          # Commit and push
+          git config user.name "zulaasim"
+          git config user.email "zulaasim03@gmail.com"
+          git add .
+          git commit -m "Update file from origin repo"
+          git push origin ${DEST_BRANCH}
+
+      
