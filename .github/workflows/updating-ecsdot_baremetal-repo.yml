@@ -22,7 +22,7 @@ jobs:
           COMMIT_USERNAME="zulaasim"
           DEST_USERNAME="zulaasim"
           COMMIT_EMAIL="zulaasim03@gmail.com"
-          COMMIT_MESSAGE="hi"
+          COMMIT_MESSAGE="XXX COMMIT MESSAGE XXX"
           DEST_REPO="testing"
           DEST_BRANCH="main"
           DEST_DIR="projects/my-project"
