@@ -23,7 +23,7 @@ jobs:
           DEST_USERNAME="zulaasim"
           COMMIT_EMAIL="zulaasim03@gmail.com"
           COMMIT_MESSAGE="hi"
-          DEST_REPO="zulaasim/testing"
+          DEST_REPO="testing"
           DEST_BRANCH="main"
           DEST_DIR="projects/my-project"
           FILES="test.md"
@@ -41,7 +41,7 @@ jobs:
         
           
           echo "##### Cloning destination repo #####"
-          git clone --single-branch --branch "$DEST_BRANCH" "https://x-access-token:${API_TOKEN_GITHUB}@github.com/${DEST_USERNAME}.git" "$CLONE_DIRECTORY"
+          git clone --single-branch --branch "$DEST_BRANCH" "https://x-access-token:${API_TOKEN_GITHUB}@github.com/${DEST_USERNAME}/${DEST_REPO}.git" "$CLONE_DIRECTORY"
 
 
 
