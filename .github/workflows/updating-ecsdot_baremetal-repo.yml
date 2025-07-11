@@ -55,7 +55,7 @@ jobs:
 
           # Commit and push
           git add .
-          git commit -m "Update file from origin repo"
+          git commit -m "$COMMIT_MESSAGE"
           git push origin ${DEST_BRANCH}
 
       
