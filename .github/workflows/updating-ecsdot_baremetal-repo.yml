@@ -50,7 +50,7 @@ jobs:
 
           echo "##### Copying contents to git repo #####"
           mkdir -p "$CLONE_DIRECTORY/$DEST_DIRECTORY"
-          cp -rvf $SOURCE_FILES "$CLONE_DIRECTORY/$DEST_DIRECTORY"
+          cp -rvf ${FILES} "$CLONE_DIRECTORY/$DEST_DIR"
           cd "$CLONE_DIRECTORY"
 
           # Commit and push
