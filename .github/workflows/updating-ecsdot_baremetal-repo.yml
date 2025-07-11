@@ -19,24 +19,41 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         run: |
           # Setup some variables
+          COMMIT_USERNAME="zulaasim"
+          DEST_USERNAME="zulaasim"
+          COMMIT_EMAIL="zulaasim03@gmail.com"
+          COMMIT_MESSAGE="hi"
           DEST_REPO="zulaasim/testing"
           DEST_BRANCH="main"
           DEST_DIR="projects/my-project"
           FILES="test.md"
+          CLONE_DIRECTORY=$(mktemp -d)
 
-          # Clone the destination repo
-          git clone https://x-access-token:${API_TOKEN_GITHUB}@github.com/${DEST_REPO}.git dest-repo
-          cd dest-repo
+          
+          echo "##### Cloning source git repository #####"
+          # Setup git
+          git config --global user.email "$COMMIT_EMAIL"
+          git config --global user.name "$COMMIT_USERNAME"
+          # Remove git directory if it exists to prevent errors
+          #maybe not needed
+          rm -rf .git
+          
+          git clone "https://$API_TOKEN_GITHUB@github.com/$GITHUB_REPOSITORY.git" repo
+          # cd repo
+          
+          git clone --single-branch --branch "$DEST_BRANCH" "https://$API_TOKEN_GITHUB@github.com/$DEST_USERNAME/$DEST_REPOSITORY.git" "$CLONE_DIRECTORY"
+
+
 
           # Switch to the target branch (create if missing)
-          git checkout ${DEST_BRANCH} || git checkout -b ${DEST_BRANCH}
+          # git checkout ${DEST_BRANCH} || git checkout -b ${DEST_BRANCH}
 
-          # Copy the files
-          cp -rvf ../${FILES} ${DEST_DIR}
+          echo "##### Copying contents to git repo #####"
+          mkdir -p "$CLONE_DIRECTORY/$DESTINATION_DIRECTORY"
+          cp -rvf $SOURCE_FILES "$CLONE_DIRECTORY/$DESTINATION_DIRECTORY"
+          cd "$CLONE_DIRECTORY"
 
           # Commit and push
-          git config user.name "zulaasim"
-          git config user.email "zulaasim03@gmail.com"
           git add .
           git commit -m "Update file from origin repo"
           git push origin ${DEST_BRANCH}
